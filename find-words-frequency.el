@@ -27,14 +27,17 @@ the word mushroom is gonna be counted."
       (goto-char from)
       (while (< (point) to)
         (right-word)
-        (setq results (cons (thing-at-point 'word) results))))
+        (let ((word (thing-at-point 'word)))
+          (if word
+              (setq results (cons word results))))))
     results))
 
 (defun fwf--count-words (from to)
   (lexical-let ((table (make-hash-table :test 'equal)))
     (mapc (lambda (x)
             (fwf--update-word x table))
-          (fwf--all-words))))
+          (fwf--all-words from to))
+    table))
 
 (defun fwf--sorted-values (table)
   (sort
