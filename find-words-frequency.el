@@ -31,13 +31,16 @@ the word mushroom is gonna be counted."
 (defun fwf--count-words (from to)
   (lexical-let ((table (make-hash-table :test 'equal)))
     (mapc (lambda (x)
-            (fwf--update-word x table))
+            (fwf--update-word (downcase x) table))
           (fwf--all-words from to))
     table))
 
 (defun fwf--sorted-values (table)
   (sort
-   (fwf--unsorted-values table)
+   (sort (fwf--unsorted-values table)
+         (lambda (a b)
+           (< (length (cadr b))
+              (length (cadr a)))))
    (lambda (a b)
      (> (car a) (car b)))))
 
