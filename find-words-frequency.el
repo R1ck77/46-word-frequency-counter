@@ -1,9 +1,5 @@
 
-
-(defun find-words-frequency ()
-  "Print the frequency of each word in the current region in a separate buffer"
-  (interactive)
-  (message (format "%s" (fwf--all-words (region-beginning) (region-end)))))
+(defconst fwf--buffer-name "Words frequency")
 
 (defun fwf--update-word (word hash-table)
   (puthash word
@@ -56,7 +52,31 @@ the word mushroom is gonna be counted."
   (fwf--sorted-values
    (fwf--count-words from to)))
 
-(defun fwf--print-results (table)
-  (mapc (lambda (tuple)
-          (message (format "%s %s" (car tuple) (cadr tuple))))
-        (fwf--sorted-values table)))
+(defun fwf--bar (number)
+  (let ((result ""))
+    (while (> number 0)
+      (setq result (concat result "*"))
+      (setq number (- number 1)))
+    result))
+
+(defun fwf--format-results (results)
+  (mapcar (lambda (pair)
+            (format "%s: %s" (cadr pair) (fwf--bar (car pair))))
+          results))
+
+(defun fwf--printable-sorted-words (from to)
+  (fwf--format-results
+   (fwf--sorted-buffer-words from to)))
+
+(defun find-words-frequency ()
+  "Print the frequency of each word in the current buffer and print them in a separate buffer"
+  (interactive)
+  (let ((results (fwf--printable-sorted-words (point-min) (point-max)))
+        (buffer (get-buffer-create fwf--buffer-name)))
+         (with-current-buffer buffer
+       (erase-buffer)
+       (mapc (lambda (x)
+               (insert x)
+               (insert "\n"))
+             results))
+    (display-buffer-other-frame buffer)))
