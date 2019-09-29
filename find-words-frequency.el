@@ -35,12 +35,15 @@ the word mushroom is gonna be counted."
           (fwf--all-words from to))
     table))
 
+(defun fwf--word-length (pair)
+  (length (cadr pair)))
+
 (defun fwf--sorted-values (table)
   (sort
    (sort (fwf--unsorted-values table)
          (lambda (a b)
-           (< (length (cadr b))
-              (length (cadr a)))))
+           (< (fwf--word-length b)
+              (fwf--word-length a))))
    (lambda (a b)
      (> (car a) (car b)))))
 
