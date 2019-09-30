@@ -58,31 +58,45 @@ the word mushroom is gonna be counted."
   (fwf--sorted-values
    (fwf--count-words from to)))
 
+(defun fwf--colorize (text color)
+  (put-text-property 0 (length text) 'font-lock-face (list ':foreground color) text)
+  text)
+
 (defun fwf--bar (number)
   (let ((result ""))
     (while (> number 0)
       (setq result (concat result "*"))
       (setq number (- number 1)))
-    result))
+    (fwf--colorize result "red")))
 
-(defun fwf--format-results (results)
-  (mapcar (lambda (pair)
-            (format "%s: %s" (cadr pair) (fwf--bar (car pair))))
-          results))
+(defun fwf--format-results (results &optional word-padding)
+  (let* ((padding (or word-padding 0))
+        (format-string (format "%%-%ds : %%s" padding)))
+    (mapcar (lambda (pair)
+              (format format-string (cadr pair) (fwf--bar (car pair))))
+            results)))
+
+(defun fwf--longest-word (results)
+  (car
+   (sort (mapcar 'cadr results)
+         (lambda (a b) (> (length a)
+                          (length b))))))
 
 (defun fwf--printable-sorted-words (from to)
-  (fwf--format-results
-   (fwf--sorted-buffer-words from to)))
+  (let* ((sorted-results (fwf--sorted-buffer-words from to)))
+    (fwf--format-results sorted-results
+                         (length (fwf--longest-word sorted-results)))))
 
 (defun find-words-frequency ()
   "Print the frequency of each word in the current buffer and print them in a separate buffer"
   (interactive)
   (let ((results (fwf--printable-sorted-words (point-min) (point-max)))
         (buffer (get-buffer-create fwf--buffer-name)))
-         (with-current-buffer buffer
-       (erase-buffer)
-       (mapc (lambda (x)
-               (insert x)
-               (insert "\n"))
-             results))
+    (with-current-buffer buffer
+      (font-lock-mode)
+      (erase-buffer)
+      (mapc (lambda (x)
+              (insert x)
+              (insert "\n"))
+            results))
     (display-buffer-other-frame buffer)))
