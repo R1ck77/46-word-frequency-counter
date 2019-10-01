@@ -1,3 +1,5 @@
+(setq load-path (cons "." load-path))
+(require 'count-words-mode)
 
 (defconst fwf--buffer-name "Words frequency")
 
