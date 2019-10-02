@@ -7,24 +7,20 @@
           (cons '(count-words-mode " CountWords")
                 minor-mode-alist)))
 
-(defun count-words-mode--compute-mode-var (arg old-value)
-  (if (null arg)
-      (not old-value)
-    (> (prefix-numeric-value arg) 0)))
+(defvar count-words-mode-hook nil
+  "Hooks to call on entering \"Count Words\" mode")
 
-(defun count-words-mode--turn-on ()
-  (message "* Turning Count words mode ON"))
+(defun count-words-mode--setup ()
+  (font-lock-mode)
+  (erase-buffer))
 
-(defun count-words-mode--turn-off ()
-  (message "* Turning Count words mode OFF"))
-
-(defun count-words-mode (&optional arg)
+(defun count-words-mode ()
   "Count Words buffer mode"
-  (interactive "P")
-  (let ((next-var-mode (count-words-mode--compute-mode-var arg count-words-mode)))
-    (if next-var-mode
-        (count-words-mode--turn-on)
-      (count-words-mode--turn-off))
-   (setq count-words-mode next-var-mode)))
+  (interactive)
+  (kill-all-local-variables)
+  (setq major-mode 'count-words-mode)
+  (setq mode-name "Count Words") ; TODO the mode should be Count Words Results mode
+  (count-words-mode--setup)
+  (run-hooks 'count-words-mode-hook))
 
 (provide 'count-words-mode)
