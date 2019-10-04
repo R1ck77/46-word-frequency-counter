@@ -8,7 +8,7 @@
            (+ (gethash word hash-table 0) 1)
            hash-table))
 
-(defun fwf--all-words (from to)
+(defun fwf--all-words (from to) ; this is responsible for about 60% of execution time
   "Return a list of all words in the range specified
 
 Some edge cases are not handled properly, but it's outside the scope of the exercise
