@@ -1,3 +1,5 @@
+(require 'seq)
+
 (setq load-path (cons "." load-path))
 (require 'count-words-mode)
 
@@ -8,7 +10,21 @@
            (+ (gethash word hash-table 0) 1)
            hash-table))
 
-(defun fwf--all-words (from to) ; this is responsible for about 60% of execution time
+(defun fwf--clean-string (text)
+  (downcase
+   (replace-regexp-in-string "[[:space:]]+" " "
+                             (replace-regexp-in-string "[^[:alnum:][:space:]]" ""
+                                                       text))))
+
+
+(defun fwf-fast-all-words (from to)
+  (seq-filter (lambda (x)
+            (> (length x) 0))
+          (split-string (fwf--clean-string
+                         (buffer-substring from to))
+                        "[ ]+")))
+
+(defun old--all-words (from to)
   "Return a list of all words in the range specified
 
 Some edge cases are not handled properly, but it's outside the scope of the exercise
@@ -34,7 +50,7 @@ the word mushroom is gonna be counted."
   (lexical-let ((table (make-hash-table :test 'equal)))
     (mapc (lambda (x)
             (fwf--update-word (downcase x) table))
-          (fwf--all-words from to))
+          (fwf-fast-all-words from to))
     table))
 
 (defun fwf--word-length (pair)
