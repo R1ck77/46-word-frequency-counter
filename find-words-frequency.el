@@ -20,15 +20,17 @@ If a region starting at <B> and ending at <E> is defined like:
     badger <B>badger <E>mushroom
 
 the word mushroom is gonna be counted."
-  (let ((results (list)))
-    (save-excursion
-      (goto-char from)
-      (while (< (point) to)
-        (right-word)
-        (let ((word (thing-at-point 'word)))
-          (if word
-              (setq results (cons word results))))))
-    results))
+  (let ((substring (buffer-substring from to)))
+    (with-temp-buffer
+      (insert substring)
+      (let ((results (list)))
+        (goto-char from)
+        (while (< (point) to)
+          (right-word)
+          (let ((word (thing-at-point 'word)))
+            (if word
+                (setq results (cons word results)))))
+        results))))
 
 (defun fwf--count-words (from to)
   (lexical-let ((table (make-hash-table :test 'equal)))
