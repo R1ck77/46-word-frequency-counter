@@ -119,3 +119,5 @@ the word mushroom is gonna be counted."
       (read-only-mode)
       (goto-char (point-min)))
     (display-buffer-other-frame buffer)))
+
+(provide 'find-words-frequency)
